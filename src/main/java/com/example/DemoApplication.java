@@ -10,23 +10,78 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @SpringBootApplication
 public class DemoApplication {
-    
-    float suma(float A, float B){
-    	return A + B;
-    }
-    
-    float resta(float A, float B){
-    	return A - B;
-    }
-    
-    float mult(float A, float B){
-    	return A * B;
-    }
-    
-    float div(float A, float B){
-    	return A / B;
-    }
-    
+	
+	public abstract class calculator{
+		public String txt; 
+		public calculator(String str){
+			txt = str;
+		}
+		public abstract float calculate(float A, float B);
+	}
+	
+	public class suma extends calculator{
+		
+		public suma(String str) {
+			super(str);
+		}
+
+		public float calculate(float A, float B){
+			return A + B;
+		}
+	}
+	public class resta extends calculator{
+		public resta(String str) {
+			super(str);
+		}
+
+		public float calculate(float A, float B){
+			return A - B;
+		}
+	}
+	public class mult extends calculator{
+		public mult(String str) {
+			super(str);
+		}
+		public float calculate(float A, float B){
+			return A * B;
+		}
+	}
+	public class div extends calculator{
+		public div(String str) {
+			super(str);
+		}
+		public float calculate(float A, float B){
+			return A / B;
+		}
+	}
+	
+	
+	public String operate(String op, float A, float B){
+		calculator calc = identify(op, A, B);
+		if ( calc != null ){
+			return calc.txt + calc.calculate(A, B);
+		}
+		return "Datos inválidos";
+	}
+	
+	public calculator identify(String op, float A, float B){
+		switch(op){
+		   	case "suma":
+		   		return new suma(A + " + " + B + " = ");
+		   	case "resta":
+		   		return new resta(A + " - " + B + " = ");
+		   	case "mult":
+		   		return new mult(A + " * " + B + " = ");
+		   	case "div":
+		   		if( B != 0 ){
+		   			return new div(A + " / " + B + " = ");
+		   		}
+		   		return null;
+		   	default:
+		   		return null;
+		}
+	}
+	
     @RequestMapping("/")
     @ResponseBody
     String home(){
@@ -49,21 +104,8 @@ public class DemoApplication {
     		return "Ingrese los valores adecuados";
     	}
     	
-    	switch(op){
-	    	case "suma":
-	    		return a + " + " + b + " = " + suma(A, B);
-	    	case "resta":
-	    		return a + " - " + b + " = " + resta(A, B);
-	    	case "mult":
-	    		return a + " x " + b + " = " + mult(A, B);
-	    	case "div":
-	    		if( B != 0 ){
-	    			return a + " / " + b + " = " + div(A, B);
-	    		}
-	    		return "B no puede ser cero (0)";
-	    	default:
-	    		return "Ingrese la operación que desea realizar";
-    	}
+    	return operate(op, A, B);    	
+    	
     }
 
     public static void main(String[] args) throws Exception {
